@@ -2,14 +2,10 @@ package com.azubike.ellipsis.springsecuritybasic.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 
 @Configuration
 public class ProjectSecurityConfig extends WebSecurityConfigurerAdapter {
@@ -45,17 +41,24 @@ public class ProjectSecurityConfig extends WebSecurityConfigurerAdapter {
 //				.passwordEncoder(NoOpPasswordEncoder.getInstance());
 //
 //	}
+	// InMemoryUserDetailsManager
+//	@Override
+//	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+//		InMemoryUserDetailsManager userDetailsService = new InMemoryUserDetailsManager();
+//		UserDetails userThree = new User("Sandra", "azubike88", List.of());
+//		UserDetails userOne = User.withUsername("Richard").password("pass123").authorities("admin").build();
+//		UserDetails userTwo = User.withUsername("Azubike").password("userpass").authorities("read").build();
+//		userDetailsService.createUser(userOne);
+//		userDetailsService.createUser(userTwo);
+//		auth.userDetailsService(userDetailsService);
+//
+//	}
 
-	@Override
-	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-		InMemoryUserDetailsManager userDetailsService = new InMemoryUserDetailsManager();
-		UserDetails userOne = User.withUsername("Richard").password("pass123").authorities("admin").build();
-		UserDetails userTwo = User.withUsername("Azubike").password("userpass").authorities("read").build();
-		userDetailsService.createUser(userOne);
-		userDetailsService.createUser(userTwo);
-		auth.userDetailsService(userDetailsService);
-
-	}
+	// Using default UserDetailsSchema for authentication
+//	@Bean
+//	public UserDetailsService userDetailsService(DataSource dataSource) {
+//		return new JdbcUserDetailsManager(dataSource);
+//	}
 
 	@SuppressWarnings("deprecation")
 	@Bean
