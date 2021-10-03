@@ -1,11 +1,18 @@
 package com.azubike.ellipsis.springsecuritybasic.config;
 
+import java.util.Collections;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
 
 @Configuration
 public class ProjectSecurityConfig extends WebSecurityConfigurerAdapter {
@@ -26,7 +33,19 @@ public class ProjectSecurityConfig extends WebSecurityConfigurerAdapter {
 
 		// custom configuration
 
-		http.authorizeRequests().antMatchers("/myAccount").authenticated().antMatchers("/myLoans").authenticated()
+		http.cors().configurationSource(new CorsConfigurationSource() {
+			@Override
+			public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
+				CorsConfiguration corsConfiguration = new CorsConfiguration();
+				corsConfiguration.setAllowedOrigins(Collections.singletonList("http://localhost:4200"));
+				corsConfiguration.setAllowedMethods(List.of("*"));
+				corsConfiguration.setAllowCredentials(true);
+				corsConfiguration.setAllowedMethods(List.of("*"));
+				corsConfiguration.setAllowedHeaders(List.of("*"));
+				corsConfiguration.setMaxAge(3600L);
+				return corsConfiguration;
+			}
+		}).and().authorizeRequests().antMatchers("/myAccount").authenticated().antMatchers("/myLoans").authenticated()
 				.antMatchers("/myBalance").authenticated().antMatchers("/myCard").authenticated()
 				.antMatchers("/notices").permitAll().antMatchers("/contact").permitAll().and().formLogin().and()
 				.httpBasic();
