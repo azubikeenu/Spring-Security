@@ -1,13 +1,28 @@
 package com.azubike.ellipsis.springsecuritybasic.controllers;
 
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.azubike.ellipsis.springsecuritybasic.model.Notice;
+import com.azubike.ellipsis.springsecuritybasic.repository.NoticeRepository;
+
 @RestController
 public class NoticesController {
+
+	@Autowired
+	private NoticeRepository noticeRepository;
+
 	@GetMapping("/notices")
-	public String getNotices(String input) {
-		return "Here are the notices details from the DB";
+	public List<Notice> getNotices() {
+		List<Notice> notices = noticeRepository.findAllActiveNotices();
+		if (notices != null) {
+			return notices;
+		} else {
+			return null;
+		}
 	}
 
 }
