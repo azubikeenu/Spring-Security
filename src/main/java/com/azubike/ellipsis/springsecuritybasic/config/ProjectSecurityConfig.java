@@ -33,6 +33,7 @@ public class ProjectSecurityConfig extends WebSecurityConfigurerAdapter {
 
 	}
 
+// inMemoryAuthentication
 //	@SuppressWarnings("deprecation")
 //	@Override
 //	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
