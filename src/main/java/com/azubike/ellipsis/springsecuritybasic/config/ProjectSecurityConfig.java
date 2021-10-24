@@ -7,15 +7,17 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
-import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.azubike.ellipsis.springsecuritybasic.filters.AuthoritiesLoggingAfterFilter;
+import com.azubike.ellipsis.springsecuritybasic.filters.JWTTokenGeneratorFilter;
+import com.azubike.ellipsis.springsecuritybasic.filters.JWTTokenValidatorFilter;
 import com.azubike.ellipsis.springsecuritybasic.filters.RequestValidationBeforeFilter;
 
 @Configuration
@@ -47,11 +49,23 @@ public class ProjectSecurityConfig extends WebSecurityConfigurerAdapter {
 //				.httpBasic();
 
 		// Roles Authorization
-		http.cors().and().csrf().ignoringAntMatchers("/contact")
-				.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()).and()
+//		http.cors().and().csrf().ignoringAntMatchers("/contact")
+//				.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()).and()
+//				.addFilterBefore(new RequestValidationBeforeFilter(), BasicAuthenticationFilter.class)
+//				.addFilterAfter(new AuthoritiesLoggingAfterFilter(), BasicAuthenticationFilter.class)
+//				.authorizeRequests().antMatchers("/myAccount").hasRole("USER").antMatchers("/myLoans").hasRole("ROOT")
+//				.antMatchers("/myBalance").hasAnyRole("USER", "ADMIN").antMatchers("/myCard").authenticated()
+//				.antMatchers("/notices").permitAll().antMatchers("/contact").permitAll().and().formLogin().and()
+//				.httpBasic();
+
+		// Using JWT-token
+
+		http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and().csrf().disable()
 				.addFilterBefore(new RequestValidationBeforeFilter(), BasicAuthenticationFilter.class)
 				.addFilterAfter(new AuthoritiesLoggingAfterFilter(), BasicAuthenticationFilter.class)
-				.authorizeRequests().antMatchers("/myAccount").hasRole("USER").antMatchers("/myLoans").hasRole("ROOT")
+				.addFilterAfter(new JWTTokenGeneratorFilter(), BasicAuthenticationFilter.class)
+				.addFilterBefore(new JWTTokenValidatorFilter(), BasicAuthenticationFilter.class).authorizeRequests()
+				.antMatchers("/myAccount").hasRole("USER").antMatchers("/myLoans").hasRole("ROOT")
 				.antMatchers("/myBalance").hasAnyRole("USER", "ADMIN").antMatchers("/myCard").authenticated()
 				.antMatchers("/notices").permitAll().antMatchers("/contact").permitAll().and().formLogin().and()
 				.httpBasic();
@@ -100,6 +114,8 @@ public class ProjectSecurityConfig extends WebSecurityConfigurerAdapter {
 		corsConfiguration.setAllowedMethods(Arrays.asList("GET", "PUT", "DELETE", "POST"));
 		corsConfiguration.setAllowCredentials(true);
 		corsConfiguration.setAllowedHeaders(Collections.singletonList("*"));
+		corsConfiguration.setExposedHeaders(Collections.singletonList("Authorization")); // for authentication using
+																							// tokens
 		corsConfiguration.setMaxAge(3600L);
 		final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 		source.registerCorsConfiguration("/**", corsConfiguration);
