@@ -1,9 +1,7 @@
 package com.azubike.ellipsis.springsecuritybasic.config;
 
+import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,8 +9,10 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Configuration
 public class ProjectSecurityConfig extends WebSecurityConfigurerAdapter {
@@ -33,20 +33,19 @@ public class ProjectSecurityConfig extends WebSecurityConfigurerAdapter {
 
 		// custom configuration
 
-		http.cors().configurationSource(new CorsConfigurationSource() {
-			@Override
-			public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
-				CorsConfiguration corsConfiguration = new CorsConfiguration();
-				corsConfiguration.setAllowedOrigins(Collections.singletonList("http://localhost:4200"));
-				corsConfiguration.setAllowedMethods(List.of("*"));
-				corsConfiguration.setAllowCredentials(true);
-				corsConfiguration.setAllowedMethods(List.of("*"));
-				corsConfiguration.setAllowedHeaders(List.of("*"));
-				corsConfiguration.setMaxAge(3600L);
-				return corsConfiguration;
-			}
-		}).and().authorizeRequests().antMatchers("/myAccount").authenticated().antMatchers("/myLoans").authenticated()
-				.antMatchers("/myBalance").authenticated().antMatchers("/myCard").authenticated()
+		// Authorities Authorization
+//		http.cors().and().csrf().ignoringAntMatchers("/contact")
+//				.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()).and().authorizeRequests()
+//				.antMatchers("/myAccount").hasAuthority("WRITE").antMatchers("/myLoans").hasAnyAuthority("READ")
+//				.antMatchers("/myBalance").hasAnyAuthority("DELETE").antMatchers("/myCard").authenticated()
+//				.antMatchers("/notices").permitAll().antMatchers("/contact").permitAll().and().formLogin().and()
+//				.httpBasic();
+
+		// Roles Authorization
+		http.cors().and().csrf().ignoringAntMatchers("/contact")
+				.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()).and().authorizeRequests()
+				.antMatchers("/myAccount").hasRole("USER").antMatchers("/myLoans").hasRole("ROOT")
+				.antMatchers("/myBalance").hasAnyRole("USER", "ADMIN").antMatchers("/myCard").authenticated()
 				.antMatchers("/notices").permitAll().antMatchers("/contact").permitAll().and().formLogin().and()
 				.httpBasic();
 
@@ -59,6 +58,7 @@ public class ProjectSecurityConfig extends WebSecurityConfigurerAdapter {
 //		auth.inMemoryAuthentication().withUser("Richard").password("password123").authorities("admin").and()
 //				.withUser("Azubike").password("userpass").authorities("read").and()
 //				.passwordEncoder(NoOpPasswordEncoder.getInstance());
+//				
 //
 //	}
 	// InMemoryUserDetailsManager
@@ -82,7 +82,22 @@ public class ProjectSecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Bean
 	PasswordEncoder passwordEncoder() {
+
 		return new BCryptPasswordEncoder();
+	}
+
+	@Bean
+	public CorsConfigurationSource corsConfigurationSource() {
+		final CorsConfiguration corsConfiguration = new CorsConfiguration();
+		corsConfiguration.setAllowedOriginPatterns(Arrays.asList("http://localhost:4200"));
+		corsConfiguration.setAllowedMethods(Arrays.asList("GET", "PUT", "DELETE", "POST"));
+		corsConfiguration.setAllowCredentials(true);
+		corsConfiguration.setAllowedHeaders(Collections.singletonList("*"));
+		corsConfiguration.setMaxAge(3600L);
+		final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+		source.registerCorsConfiguration("/**", corsConfiguration);
+		return source;
+
 	}
 
 }

@@ -22,6 +22,7 @@ public class EazyBankUserDetails implements UserDetailsService {
 		List<Customer> customers = customerRepository.findByEmail(username);
 		if (customers.size() == 0)
 			throw new UsernameNotFoundException("No record found for " + username);
+
 		return new SecurityCustomer(customers.get(0));
 	}
 
