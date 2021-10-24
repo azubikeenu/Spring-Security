@@ -9,10 +9,14 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import com.azubike.ellipsis.springsecuritybasic.filters.AuthoritiesLoggingAfterFilter;
+import com.azubike.ellipsis.springsecuritybasic.filters.RequestValidationBeforeFilter;
 
 @Configuration
 public class ProjectSecurityConfig extends WebSecurityConfigurerAdapter {
@@ -25,6 +29,7 @@ public class ProjectSecurityConfig extends WebSecurityConfigurerAdapter {
 		 */
 		// default configuration
 		// http.authorizeRequests().anyRequest().authenticated().and().formLogin().and().httpBasic();
+
 		// configuration to deny all requests
 		// http.authorizeRequests().anyRequest().denyAll().and().formLogin().and().httpBasic();
 
@@ -43,8 +48,10 @@ public class ProjectSecurityConfig extends WebSecurityConfigurerAdapter {
 
 		// Roles Authorization
 		http.cors().and().csrf().ignoringAntMatchers("/contact")
-				.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()).and().authorizeRequests()
-				.antMatchers("/myAccount").hasRole("USER").antMatchers("/myLoans").hasRole("ROOT")
+				.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()).and()
+				.addFilterBefore(new RequestValidationBeforeFilter(), BasicAuthenticationFilter.class)
+				.addFilterAfter(new AuthoritiesLoggingAfterFilter(), BasicAuthenticationFilter.class)
+				.authorizeRequests().antMatchers("/myAccount").hasRole("USER").antMatchers("/myLoans").hasRole("ROOT")
 				.antMatchers("/myBalance").hasAnyRole("USER", "ADMIN").antMatchers("/myCard").authenticated()
 				.antMatchers("/notices").permitAll().antMatchers("/contact").permitAll().and().formLogin().and()
 				.httpBasic();
