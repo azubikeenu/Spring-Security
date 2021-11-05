@@ -21,6 +21,7 @@ public class LoansController {
 	public List<Loans> getLoanDetails(@RequestBody Customer customer) {
 		List<Loans> loans = loanRepository.findByCustomerIdOrderByStartDtDesc(customer.getId());
 		if (loans != null) {
+			System.out.println(loans);
 			return loans;
 		} else {
 			return null;
