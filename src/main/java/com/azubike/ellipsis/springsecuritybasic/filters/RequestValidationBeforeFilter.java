@@ -29,6 +29,7 @@ public class RequestValidationBeforeFilter implements Filter {
 		HttpServletRequest req = (HttpServletRequest) request;
 		HttpServletResponse res = (HttpServletResponse) response;
 		String header = req.getHeader(AUTHORIZATION);
+		System.out.println(header);
 		if (header != null) {
 			header = header.trim();
 			if (StringUtils.startsWithIgnoreCase(header, AUTHENTICATION_SCHEME_BASIC)) {

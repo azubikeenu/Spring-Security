@@ -28,10 +28,10 @@ public class JWTTokenValidatorFilter extends OncePerRequestFilter {
 	public void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
 			throws IOException, ServletException {
 		String jwt = request.getHeader(SecurityConstants.JWT_HEADER);
-		if (null != jwt) {
+		if (jwt != null && jwt.startsWith(SecurityConstants.TOKEN_PREFIX)) {
 			try {
+				jwt = jwt.replace(SecurityConstants.TOKEN_PREFIX, "");
 				SecretKey key = Keys.hmacShaKeyFor(SecurityConstants.JWT_KEY.getBytes(StandardCharsets.UTF_8));
-
 				Claims claims = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(jwt).getBody();
 				String username = String.valueOf(claims.get("username"));
 				String authorities = (String) claims.get("authorities");
