@@ -36,7 +36,10 @@ public class RequestValidationBeforeFilter implements Filter {
 				byte[] base64Token = header.substring(6).getBytes(StandardCharsets.UTF_8);
 				byte[] decoded;
 				try {
+					// this returns a byte of decoded string
 					decoded = Base64.getDecoder().decode(base64Token);
+					// uses the String constructor variation String​(byte[] bytes, Charset charset)
+					// and returns the string in UTF_8 format
 					String token = new String(decoded, getCredentialsCharset(req));
 					int delim = token.indexOf(":");
 					if (delim == -1) {

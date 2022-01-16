@@ -34,6 +34,7 @@ public class EazyBankUsernamePwdAuthenticationProvider implements Authentication
 		if (customers.size() > 0) {
 			if (passwordEncoder.matches(password, customers.get(0).getPwd())) {
 				List<GrantedAuthority> authorities = getAuthorities(customers.get(0).getAuthorities());
+				// this returns an authentication object
 				return new UsernamePasswordAuthenticationToken(username, customers, authorities);
 			} else {
 				throw new BadCredentialsException("Invalid password");
@@ -54,8 +55,8 @@ public class EazyBankUsernamePwdAuthenticationProvider implements Authentication
 	}
 
 	@Override
-	public boolean supports(Class<?> authenticationTyoe) {
-		return authenticationTyoe.equals(UsernamePasswordAuthenticationToken.class);
+	public boolean supports(Class<?> authenticationType) {
+		return authenticationType.equals(UsernamePasswordAuthenticationToken.class);
 	}
 
 }

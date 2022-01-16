@@ -19,12 +19,7 @@ public class LoginController {
 	@RequestMapping("/user")
 	public Customer getUserDetailsAfterLogin(Principal user) {
 		List<Customer> customers = customerRepository.findByEmail(user.getName());
-		if (customers.size() > 0) {
-			return customers.get(0);
-		} else {
-			return null;
-		}
-
+		return customers.size() > 0 ? customers.get(0) : null;
 	}
 
 }

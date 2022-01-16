@@ -28,6 +28,7 @@ public class ProjectSecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
+
 		/*
 		 * myAccounts -- secured myLoans -- secured myBalance -- secured myCard ---
 		 * secured notices -- public contact -- public
@@ -43,7 +44,7 @@ public class ProjectSecurityConfig extends WebSecurityConfigurerAdapter {
 
 		// custom configuration
 
-		// Authorities Authorization
+		// Authorities Authorization and csrf configuration
 //		http.cors().and().csrf().ignoringAntMatchers("/contact")
 //				.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()).and().authorizeRequests()
 //				.antMatchers("/myAccount").hasAuthority("WRITE").antMatchers("/myLoans").hasAnyAuthority("READ")
@@ -72,7 +73,7 @@ public class ProjectSecurityConfig extends WebSecurityConfigurerAdapter {
 						config.setAllowedMethods(Collections.singletonList("*"));
 						config.setAllowCredentials(true);
 						config.setAllowedHeaders(Collections.singletonList("*"));
-						config.setExposedHeaders(Arrays.asList("Authorization"));
+						config.setExposedHeaders(Arrays.asList("Authorization", "Content-type"));
 						config.setMaxAge(3600L);
 						return config;
 					}
